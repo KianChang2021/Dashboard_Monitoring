@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.2/chart.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+
+<body style="background-color:black">
+<table>
+  <tr> 
+    <h1 class="title">Monitoring System</h1>
+    <div id="date" class="date"></div>
+  </tr> 
+</table>
+
+<hr class="line"/>
+<table>
+  <tr class="row">
+    <td class = "chart-box">
+      <div>
+        <h2 class="title2">Ara Damansara</h2>
+        <canvas id="myChart0" class="mainchart" ></canvas>
+      </div>  
+    </td>
+    </div>
+    <td class = "chart-box">
+      <div>
+        <h2 class="title2">Port Dickson</h2>
+        <canvas id="myChart1" class="mainchart" ></canvas>
+      </div>  
+    </td>
+    <td class = "chart-box">
+      <div>
+        <h2 class="title2">Keningau</h2>
+        <canvas id="myChart2" class="mainchart" ></canvas>
+      </div>  
+    </td>
+
+  </tr>
+</table>
+<hr class="line"/>
+<table>
+  <tr class="row_1">
+    <div>
+    <td class = "chart-box"><h2 class="title2">Ara Damansara</h2><canvas id="myChart3" class="mainchart"></canvas></td>
+    </div>
+    <div>
+    <td class = "chart-box"><h2 class="title2">Port Dickson</h2><canvas id="myChart4" class="mainchart"></canvas></td>
+    </div>
+    <div>
+    <td class = "chart-box"><h2 class="title2">Keningau</h2><canvas id="myChart5" class="mainchart"></canvas></td>
+    </div>
+  </tr>
+</table>
+
+<hr class="line"/>
+<script type="text/javascript">
+
+new Date().toLocaleString();
+document.getElementById("date")
+
+
+
+setTimeout(function () { 
+    location.reload();
+  }, 10 * 1000);
+$(document).ready(function(){
+  var dt = new Date();
+  document.getElementById("date").innerHTML = "Last Update time : "+dt.toLocaleString();
+  document.getElementById("date").style.textAlign = "right";
+  document.getElementById("date").style.color = "white";
+
+  var xValues = ["Pass", "Fail"];
+  var barColors = [
+    "#00E396",
+    "#f8bbd0"
+  ];
+  $.ajax({
+    url:"http://192.168.60.105:8085/MA_Status/",
+    contentType: "application/json",
+    method: "GET",
+    success: function(response){
+      if(response['MA'].length !=0){
+        var tooltips = response['MA']
+        var yValues_1 = [0,1];
+      }
+      else{
+        var tooltips = "All Pass"
+        var yValues_1 = [1,0];
+      }
+      for (let i=0; i< 3;i++){
+        let chart = "myChart" + String([i])
+        
+        let ARA_FAIL= response['MA']
+      new Chart(chart, {
+        type: "doughnut",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues_1
+          }]
+        },
+        options: {
+          plugins:{
+            title:{
+              display: true,
+              text: 'All MA Status',
+              color: "White",
+              font:{size:20,}
+            },
+            tooltip:{
+              callbacks:{
+                label:  function(tooltipItem){
+                  return ``+tooltips+``
+                } 
+              },
+              titleFontSize: 30,
+              bodyFontSize: 30,
+            },
+            legend:{
+              labels:{
+                color:"White",
+                font:{size:14}
+              }
+            },
+          }
+        }
+      });
+      }
+      for (let i=3; i< 6;i++){
+        if(response['Live_Data'].length !=0){
+          console.log("here live _data")
+          var tooltips = response['Live_Data']
+          var yValues_1 = [0,1];
+        }
+        else{
+          var tooltips = "All Pass"
+          var yValues_1 = [1,0];
+        }
+        let chart = "myChart" + String([i])
+
+        let ARA_FAIL= response['Live_Data'];
+        console.log(response['Live_Data']);
+        new Chart(chart, {
+        type: "doughnut",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues_1
+          }]
+        },
+        options: {
+          plugins:{
+            title:{
+              display: true,
+              text: 'All MA Status',
+              color: "White",
+              font:{size:20,}
+            },
+            tooltip:{
+              callbacks:{
+                label:  function(tooltipItem){
+                  return ``+tooltips+``
+                } 
+              },
+              titleFontSize: 30,
+              bodyFontSize: 30,
+            },
+            legend:{
+              labels:{
+                color:"White",
+                font:{size:14}
+              }
+            }
+          }
+        }
+      });
+      }
+      
+      },error:function(error){
+        console.log("error")
+        console.log(error)
+      }
+    })
+})
+</script>
+
+</body>
+</html>
